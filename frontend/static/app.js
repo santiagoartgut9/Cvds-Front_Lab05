@@ -1,43 +1,56 @@
 const apiBase = "http://localhost:8080";
 
-document.addEventListener("DOMContentLoaded", () => {
-    cargarLaboratorios();
-    agregarAnimaciones();
-});
+document.addEventListener("DOMContentLoaded", cargarLaboratorios);
 
 async function cargarLaboratorios() {
-    const response = await fetch(`${apiBase}/laboratorios`);
-    const laboratorios = await response.json();
+    try {
+        const response = await fetch(`${apiBase}/laboratorios`);
+        if (!response.ok) throw new Error("Error al obtener los laboratorios");
 
-    ["laboratorioSelect", "laboratorioReserva"].forEach(id => {
-        const select = document.getElementById(id);
-        select.innerHTML = "";
-        laboratorios.forEach(lab => {
-            const option = document.createElement("option");
-            option.value = lab.id;
-            option.textContent = lab.nombre;
-            select.appendChild(option);
+        const laboratorios = await response.json();
+
+        ["laboratorioSelect", "laboratorioReserva"].forEach(id => {
+            const select = document.getElementById(id);
+            select.innerHTML = "<option value=''>Seleccione un laboratorio</option>";
+            laboratorios.forEach(lab => {
+                const option = document.createElement("option");
+                option.value = lab.id;
+                option.textContent = lab.nombre;
+                select.appendChild(option);
+            });
         });
-    });
+    } catch (error) {
+        mostrarNotificacion("Error al cargar los laboratorios", "error");
+    }
 }
 
 async function consultarDisponibilidad() {
     const idLab = document.getElementById("laboratorioSelect").value;
     const fecha = document.getElementById("fechaConsulta").value;
     const hora = document.getElementById("horaConsulta").value;
-    const banner = document.querySelector("#consultaForm").closest(".banner");
 
-    const response = await fetch(`${apiBase}/reservas`);
-    const reservas = await response.json();
+    if (!idLab || !fecha || !hora) {
+        mostrarNotificacion("Por favor, complete todos los campos.", "warning");
+        return;
+    }
 
-    const reservada = reservas.some(r =>
-        r.idLaboratorio === idLab &&
-        r.fecha === fecha &&
-        r.horaInicio <= hora &&
-        r.horaFin > hora
-    );
+    try {
+        const response = await fetch(`${apiBase}/reservas`);
+        if (!response.ok) throw new Error("Error al obtener reservas");
 
-    mostrarNotificacion(reservada ? "El laboratorio está reservado." : "El laboratorio está disponible.", banner);
+        const reservas = await response.json();
+        const fechaIngresada = new Date(fecha).toISOString().split("T")[0];
+        const reservada = reservas.some(r =>
+            r.idLaboratorio === idLab &&
+            r.fecha.split("T")[0] === fechaIngresada &&
+            r.horaInicio <= hora &&
+            r.horaFin > hora
+        );
+
+        mostrarNotificacion(reservada ? "El laboratorio está reservado." : "El laboratorio está disponible.", reservada ? "info" : "success");
+    } catch (error) {
+        mostrarNotificacion("No se pudo verificar la disponibilidad.", "error");
+    }
 }
 
 async function reservarLaboratorio() {
@@ -51,55 +64,52 @@ async function reservarLaboratorio() {
         estado: "Confirmada"
     };
 
-    const banner = document.querySelector("#reservaForm").closest(".banner");
+    if (!reserva.idLaboratorio || !reserva.fecha || !reserva.horaInicio || !reserva.horaFin || !reserva.proposito || !reserva.usuario) {
+        mostrarNotificacion("Por favor, complete todos los campos.", "warning");
+        return;
+    }
 
-    const response = await fetch(`${apiBase}/reservas`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(reserva)
-    });
+    try {
+        const response = await fetch(`${apiBase}/reservas`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(reserva)
+        });
 
-    mostrarNotificacion(response.ok ? "Reserva creada con éxito!" : "Error al crear la reserva", banner);
+        if (!response.ok) throw new Error("Error al crear la reserva");
+        mostrarNotificacion("Reserva creada con éxito!", "success");
+    } catch (error) {
+        mostrarNotificacion("No se pudo crear la reserva.", "error");
+    }
 }
 
 async function cancelarReserva() {
     const id = document.getElementById("idReservaCancelar").value;
-    const banner = document.querySelector("#cancelarForm").closest(".banner");
 
-    const response = await fetch(`${apiBase}/reservas/${id}`, {
-        method: "DELETE"
-    });
-
-    mostrarNotificacion(response.ok ? "Reserva cancelada!" : "Error al cancelar", banner);
-}
-
-function mostrarNotificacion(mensaje, banner) {
-    const notificacionExistente = banner.querySelector(".notificacion");
-    if (notificacionExistente) {
-        notificacionExistente.remove();
+    if (!id) {
+        mostrarNotificacion("Por favor, ingrese el ID de la reserva.", "warning");
+        return;
     }
 
-    const notificacion = document.createElement("div");
-    notificacion.className = "notificacion";
-    notificacion.innerHTML = `<span>${mensaje}</span> <button onclick="this.parentElement.remove()">✖</button>`;
+    try {
+        const response = await fetch(`${apiBase}/reservas/${id}`, {
+            method: "DELETE"
+        });
 
-    banner.appendChild(notificacion);
-
-    setTimeout(() => {
-        if (notificacion.parentElement) {
-            notificacion.remove();
-        }
-    }, 5000);
+        if (!response.ok) throw new Error("Error al cancelar la reserva");
+        mostrarNotificacion("Reserva cancelada con éxito!", "success");
+    } catch (error) {
+        mostrarNotificacion("No se pudo cancelar la reserva.", "error");
+    }
 }
 
-function agregarAnimaciones() {
-    document.querySelectorAll(".banner").forEach(banner => {
-        banner.style.opacity = 0;
-        banner.style.transform = "translateY(20px)";
-        setTimeout(() => {
-            banner.style.transition = "all 0.5s ease-out";
-            banner.style.opacity = 1;
-            banner.style.transform = "translateY(0)";
-        }, 300);
+function mostrarNotificacion(mensaje, tipo) {
+    Swal.fire({
+        text: mensaje,
+        icon: tipo,
+        toast: true,
+        position: "top",
+        showConfirmButton: false,
+        timer: 3000
     });
 }

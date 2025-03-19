@@ -1,136 +1,49 @@
 body {
-    font-family: "Segoe UI", sans-serif;
-    background: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjUeaFm8p0xNIIDEIqUlWmbP_GeZRFLVseHb-rARunbOkhXpV2RT01U1sjoI-UgU5vJzfaaYTKHIw5tw89Bcr3SU3uL1HWqceOnQgicIXyymG4__kwzwdtH0cx1ELcuT3tHMFa2LUKHxH4BrCAc4Xt-dIhDe_ms7Wf2SKJ80VJcAKTYyA015OJ-JVik/s16000/pared-hormigon-azul-textura_53876-94030.jpg') no-repeat center center fixed;
-    background-size: cover;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    padding: 20px;
+    background-color: #f4f7fc;
+    font-family: 'Arial', sans-serif;
 }
 
-header {
-    width: 100%;
-    background: linear-gradient(135deg, #153861, #357abd);
-    color: white;
-    text-align: center;
-    padding: 20px 0;
-    font-size: 24px;
-    font-weight: bold;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+.navbar {
+    background-color: #A81D32 !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.container {
-    width: 90%;
-    max-width: 1200px;
-    text-align: center;
-    margin-top: 20px;
+.logo {
+    height: 60px;
 }
 
-h1 {
-    font-size: 28px;
-    color: black;
-    margin-bottom: 20px;
+.card {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    height: 100%;
 }
 
-.horizontal-sections {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-}
-
-.banner {
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(12px);
-    padding: 20px;
-    border-radius: 16px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-    flex: 1;
-    min-width: 300px;
-    transition: transform 0.3s ease-in-out;
-    position: relative;
-}
-
-.banner:hover {
+.card:hover {
     transform: translateY(-5px);
 }
 
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 1s ease-in forwards;
 }
 
-input, select, button {
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    width: 80%;
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-input, select {
-    background: rgba(255, 255, 255, 0.6);
-    outline: none;
+.btn {
+    transition: background-color 0.3s ease;
 }
 
-button {
-    background: #153861;
-    color: white;
-    cursor: pointer;
-    transition: background 0.3s;
+.btn-info:hover {
+    background-color: #0275d8;
 }
 
-button:hover {
-    background: #628db8;
+.btn-success:hover {
+    background-color: #218838;
 }
 
-.notificacion {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(255, 255, 255, 1);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: black;
-    padding: 14px 40px 14px 20px;
-    border-radius: 12px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
-    font-size: 14px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-width: 220px;
-    max-width: 350px;
-    animation: fade-in 0.3s forwards;
-}
-
-.notificacion button {
-    background: transparent;
-    border: none;
-    font-size: 16px;
-    font-weight: bold;
-    color: black;
-    cursor: pointer;
-    margin-left: 12px;
-}
-
-.notificacion button:hover {
-    color: red;
-}
-
-footer {
-    width: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    text-align: center;
-    padding: 15px 0;
-    font-size: 14px;
-    position: fixed;
-    bottom: 0;
-    left: 0;
+.btn-danger:hover {
+    background-color: #c82333;
 }
